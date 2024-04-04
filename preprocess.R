@@ -1,32 +1,49 @@
-packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc") 
+packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc",
+              "snakecase") 
 invisible(lapply(packages, require, character.only = TRUE ))
+source('funcs.R')
+
+# Questions for Ibrar: does FG not have rows?
+
+# Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent with other file, and removed 
+# extra row in one sheet
+
+###################################################################
+###                    LICOR DATA                               ###
+###################################################################
+
+### Read in data
+fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
+ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
+ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
+
+fabian_raw <- readLicorData(fg_filepath) %>% data.frame() %>% mutate(row = "R1")
+ley09_raw <- readLicorData(ley09_filepath) %>% data.frame()
+ley06_raw <- readLicorData(ley06_filepath) %>% data.frame()
+
+# Combine into one file
+#licor_df <- bind_rows(ley06_raw, ley09_raw)
+
+###################################################################
+###                        SHU DATA                             ###
+###################################################################
+
+### Read in data
+
+hplcpath <- 'Data/hplcData.xlsx'
+hplc_raw <- read_xlsx(path = hplcpath, sheet = 'shu')
 
 
-
-#####################
-### READ IN DATA 
-#####################
-hplcPath <- 'Data/hplcData.xlsx'
-hplcRaw <- read_xlsx(path = hplcPath, sheet = 'shu')
-
-shuLabel <- tibble(
-  category = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot"),
-  min = c(0, 2000, 50000, 250000, 1000000),
-  max = c(2000, 50000,250000,1000000, (1000000^2))
-)
-######################
-### CLEAN DATA
-######################
-
-### Handle non numeric HPLC values
-hplcDf <- hplcRaw %>% rename(hplcRaw = hplc) %>% mutate(
+### Clean/Wrangle Data
+# Handle non numeric HPLC values
+hplc_df <- hplc_raw %>% rename(hplcRaw = hplc) %>% mutate(
   hplc = as.numeric(hplcRaw)
 )
-print((hplcDf %>% filter(is.na(hplc)))$hplcRaw)
+#print((hplcDf %>% filter(is.na(hplc)))$hplcRaw)
 #[1] "<50"  "<100" "<100" "<100" "<50"  "<30" 
 
-### Add/Clean columns
-hplcDf %<>% mutate(
+## Add/Clean columns
+hplc_df %<>% mutate(
   # Set all variable types
   hplc = case_when(hplcRaw == "<30" ~ 29,
                    hplcRaw == "<50" ~ 49,
@@ -50,3 +67,6 @@ hplcDf %<>% mutate(
   ),
   shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot"))
 )
+
+################################################################################
+rm(hplc_raw)

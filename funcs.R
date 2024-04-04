@@ -27,13 +27,13 @@ readLicorData <- function(filepath){
   sheetnames <- excel_sheets(filepath)
   df <- lapply(set_names(sheetnames, sheetnames),
                function(x) readSheetWData(filepath, x)) %>% 
-    bind_rows(.id = "row_corrected")
+    bind_rows(.id = "row_corrected")  
   
   # Convert colnames to snake_case
   colnames(df) <- to_any_case(colnames(df))
 
   
-  return(df)
+  return(df %>% data.frame() )
 }
 
 convertGbsToChar <- function(gbs){

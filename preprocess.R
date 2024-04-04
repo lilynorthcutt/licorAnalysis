@@ -1,9 +1,11 @@
 packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc",
-              "snakecase") 
+              "snakecase", "lubridate") 
 invisible(lapply(packages, require, character.only = TRUE ))
 source('funcs.R')
 
 # Questions for Ibrar: does FG not have rows?
+# we don't know which rows are for which shu?
+# 
 
 # Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent with other file, and removed 
 # extra row in one sheet
@@ -17,12 +19,14 @@ fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
 ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
 ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
 
-fabian_raw <- readLicorData(fg_filepath) %>% data.frame() %>% mutate(row = "R1")
-ley09_raw <- readLicorData(ley09_filepath) %>% data.frame()
-ley06_raw <- readLicorData(ley06_filepath) %>% data.frame()
+fabian_raw <- readLicorData(fg_filepath) %>% data.frame() %>% mutate(row_corrected = "R1",
+                                                                     row = "R1") %>% rename(genotype = genotypes)
+ley09_raw <- readLicorData(ley09_filepath) %>% data.frame() 
+ley06_raw <- readLicorData(ley06_filepath) %>% data.frame() %>% mutate(time = parse_date_time(time, '%I:%M:%S'))
 
 # Combine into one file
-#licor_df <- bind_rows(ley06_raw, ley09_raw)
+licor_df <- bind_rows(fabian_raw, ley09_raw) %>% 
+  bind_rows(ley06_raw ) 
 
 ###################################################################
 ###                        SHU DATA                             ###

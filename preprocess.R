@@ -19,10 +19,15 @@ fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
 ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
 ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
 
-fabian_raw <- readLicorData(fg_filepath) %>% data.frame() %>% mutate(row_corrected = "R1",
+fabian_raw <- readLicorData(fg_filepath)  %>% mutate(row_corrected = "R1",
                                                                      row = "R1") %>% rename(genotype = genotypes)
-ley09_raw <- readLicorData(ley09_filepath) %>% data.frame() 
-ley06_raw <- readLicorData(ley06_filepath) %>% data.frame() %>% mutate(time = parse_date_time(time, '%I:%M:%S'))
+ley09_raw <- readLicorData(ley09_filepath) 
+ley06_raw <- readLicorData(ley06_filepath) %>% mutate(time = parse_date_time(time, '%H:%M:%S'),
+                                                      date = as.Date(date  , format = "%Y-%m-%d"),
+                                                      match_time = parse_date_time(match_time, '%H:%M:%S'),
+                                                      match_date = as.Date(match_date  , format = "%Y-%m-%d"))
+#which(is.na(ley06_raw$time))
+
 
 # Combine into one file
 licor_df <- bind_rows(fabian_raw, ley09_raw) %>% 

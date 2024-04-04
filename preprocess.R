@@ -2,30 +2,41 @@ packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc
               "snakecase", "lubridate") 
 invisible(lapply(packages, require, character.only = TRUE ))
 source('funcs.R')
+###############################################################################
+## NOTES:
+# We have 4 data sources for this project. They are the following:
+# 1. LICOR Data collected from LI600. Data was collected on 3 different 
+#.   days, each one with their own file. Contains porometry and fluorometry data
+# 2. SHU Data collected from HPLC. Contains scoville heat unit data
+# 3. Plant data collected from human entry. Contains data taken at harvest such 
+#.   as pepper weight, yield, number of mature/unripe fruit, etc.
+# 4. Environmental data
 
 # Questions for Ibrar: does FG not have rows?
 # we don't know which rows are for which shu?
 # 
 
-# Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent with other file, and removed 
-# extra row in one sheet
+# Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent 
+# with other file, and removed extra row in one sheet
+################################################################################
 
-###################################################################
-###                    LICOR DATA                               ###
-###################################################################
+################################################################################
+#########                     LICOR DATA                               #########
+################################################################################
 
 ### Read in data
 fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
 ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
 ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
 
-fabian_raw <- readLicorData(fg_filepath)  %>% mutate(row_corrected = "R1",
-                                                                     row = "R1") %>% rename(genotype = genotypes)
+fabian_raw <- readLicorData(fg_filepath)  %>% 
+  mutate(row_corrected = "R1",row = "R1") %>% rename(genotype = genotypes)
 ley09_raw <- readLicorData(ley09_filepath) 
-ley06_raw <- readLicorData(ley06_filepath) %>% mutate(time = parse_date_time(time, '%H:%M:%S'),
-                                                      date = as.Date(date  , format = "%Y-%m-%d"),
-                                                      match_time = parse_date_time(match_time, '%H:%M:%S'),
-                                                      match_date = as.Date(match_date  , format = "%Y-%m-%d"))
+ley06_raw <- readLicorData(ley06_filepath) %>% 
+  mutate(time = parse_date_time(time, '%H:%M:%S'),
+         date = as.Date(date  , format = "%Y-%m-%d"),
+         match_time = parse_date_time(match_time, '%H:%M:%S'),
+         match_date = as.Date(match_date  , format = "%Y-%m-%d"))
 #which(is.na(ley06_raw$time))
 
 
@@ -33,9 +44,12 @@ ley06_raw <- readLicorData(ley06_filepath) %>% mutate(time = parse_date_time(tim
 licor_df <- bind_rows(fabian_raw, ley09_raw) %>% 
   bind_rows(ley06_raw ) 
 
-###################################################################
-###                        SHU DATA                             ###
-###################################################################
+### Clean/Wrangle Data
+licor_df %<>% mutate(label23C = convert23CToChar(genotype))
+
+################################################################################
+#########                         SHU DATA                             #########
+################################################################################
 
 ### Read in data
 
@@ -74,8 +88,9 @@ hplc_df %<>% mutate(
     (hplc <= 1000000 & hplc > 250000) ~"Extremely Hot",
     T ~"Superhot"
   ),
-  shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot"))
+  shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot")),
+  label23C = convert23CToChar(label23C)
 )
 
 ################################################################################
-rm(hplc_raw)
+rm(hplc_raw, fabian_raw, ley06_raw, ley09_raw)

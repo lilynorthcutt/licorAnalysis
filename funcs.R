@@ -36,7 +36,7 @@ readLicorData <- function(filepath){
   return(df %>% data.frame() )
 }
 
-convertGbsToChar <- function(gbs){
+convert23CToChar <- function(gbs){
   'Function that converts a gbs to string (if originally numeric)
   NOTE - GBS convention states that all GBS numbers have 3 characters,
   if the number is less that 100, then the missing space will be filled in by 0.

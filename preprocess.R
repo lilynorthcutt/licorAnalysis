@@ -29,10 +29,10 @@ fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
 ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
 ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
 
-fabian_raw <- readLicorData(fg_filepath)  %>% 
+fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
   mutate(row_corrected = "R1",row = "R1") %>% rename(genotype = genotypes)
-ley09_raw <- readLicorData(ley09_filepath) 
-ley06_raw <- readLicorData(ley06_filepath) %>% 
+ley09_raw <- readLicorData(ley09_filepath, "Leyendecker") 
+ley06_raw <- readLicorData(ley06_filepath, "Leyendecker") %>% 
   mutate(time = parse_date_time(time, '%H:%M:%S'),
          date = as.Date(date  , format = "%Y-%m-%d"),
          match_time = parse_date_time(match_time, '%H:%M:%S'),

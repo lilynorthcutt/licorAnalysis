@@ -19,7 +19,7 @@ readSheetWData <- function(filepath, sheet){
   return(df)
 }
 
-readLicorData <- function(filepath){
+readLicorData <- function(filepath, location){
   'Function reads in all sheets of LICOR workbook, and combines all into one dataframe
   NOTE - if only 1 sheet, should have all 3 rows, if multiple sheets, each sheet should be different rows'
   
@@ -27,7 +27,8 @@ readLicorData <- function(filepath){
   sheetnames <- excel_sheets(filepath)
   df <- lapply(set_names(sheetnames, sheetnames),
                function(x) readSheetWData(filepath, x)) %>% 
-    bind_rows(.id = "row_corrected")  
+    bind_rows(.id = "row_corrected")  %>% 
+    mutate(location = location)
   
   # Convert colnames to snake_case
   colnames(df) <- to_any_case(colnames(df))

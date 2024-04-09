@@ -6,9 +6,9 @@ shinyServer(function(input, output) {
   # Filter dataframe based on selected values
   filtered_df <- reactive({
     if (is.null(input$label_filter)) {
-      return(hplcDf)
+      return(hplc_df)
     } else {
-      hplcDf %>%  filter(label23C %in% input$label_filter)  
+      hplc_df %>%  filter(label23C %in% input$label_filter)  
     }
   })
   
@@ -31,7 +31,7 @@ shinyServer(function(input, output) {
   # Boxplot of hplc by location
   output$plot_box_hplc <- renderPlot({
     ggplot(filtered_df()) +
-      geom_boxplot(aes(x = label23C, y = hplc, group = label23C)) +
+      geom_boxplot(aes(x = label23C, y = shu, group = label23C)) +
       geom_hline(yintercept=2000, linetype="dashed", color = "red")+
       geom_hline(yintercept=5000, linetype="dashed", color = "red")+
       facet_wrap(.~location)

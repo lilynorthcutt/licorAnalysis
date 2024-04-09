@@ -62,13 +62,13 @@ hplc_raw <- read_xlsx(path = hplcpath, sheet = 'shu')
 hplc_df <- hplc_raw %>% rename(hplcRaw = hplc) %>% mutate(
   hplc = as.numeric(hplcRaw)
 )
-#print((hplcDf %>% filter(is.na(hplc)))$hplcRaw)
+#print((hplc_df %>% filter(is.na(hplc)))$hplcRaw)
 #[1] "<50"  "<100" "<100" "<100" "<50"  "<30" 
 
 ## Add/Clean columns
 hplc_df %<>% mutate(
   # Set all variable types
-  hplc = case_when(hplcRaw == "<30" ~ 29,
+  shu = case_when(hplcRaw == "<30" ~ 29,
                    hplcRaw == "<50" ~ 49,
                    hplcRaw == "<100" ~ 100,
                    T ~ hplc), 
@@ -82,10 +82,10 @@ hplc_df %<>% mutate(
   sampleCount = row_number(),
   #outlier = outlierCheck(hplc)
   shuLabel = case_when(
-    hplc <= 2000 ~ "Mild",
-    (hplc <= 5000 & hplc > 2000) ~"Hot",
-    (hplc <= 250000 & hplc > 5000) ~"Very Hot",
-    (hplc <= 1000000 & hplc > 250000) ~"Extremely Hot",
+    shu <= 2000 ~ "Mild",
+    (shu <= 5000 & shu > 2000) ~"Hot",
+    (shu <= 250000 & shu > 5000) ~"Very Hot",
+    (shu <= 1000000 & shu > 250000) ~"Extremely Hot",
     T ~"Superhot"
   ),
   shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot")),

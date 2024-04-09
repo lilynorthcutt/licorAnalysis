@@ -16,7 +16,7 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                  pickerInput(
                    "label_filter",
                    "Select Labels",
-                   choices = unique(hplcDf$label23C),
+                   choices = unique(hplc_df$label23C),
                    options = list(`actions-box` = TRUE),
                    multiple = TRUE
                  ),

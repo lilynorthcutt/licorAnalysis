@@ -10,6 +10,8 @@
   <p align="center">
     This project is a part of the New Mexico State (NMSU) Chile Pepper Institute's (CPI) research program, and is        built in R to understand underlying relationships between stress and capsaicin content in New Mexico.
     <br />
+    :hot_pepper:
+    <br />
     <br />
     <a href="https://cpi.nmsu.edu">CPI Homepage</a> 
     ·
@@ -25,9 +27,9 @@
 - [Getting Started](#getting-started)
    * [Pre-Requisites](#pre-requisites)
    * [Installation Instructions](#installation-instructions)
+   * [Running the Code](#running-the-code)
 - [Data](#data)
-   * [Source Data](#source-data)
-   * [Data Acquisition](#data-acquisition)
+   * [Data Sources](#data-sources)
    * [Data Preprocessing](#data-preprocessing)
 - [Code Structure](#code-structure)
 - [Results and Eval](#results-and-eval)
@@ -41,7 +43,7 @@
 
 
 <!-- About The Project -->
-## About The Project
+## About The Project 
 
 We are looking at plant porometry, fluorometry, plant yield/maturity, and environmental factor data to gain better insight into the scoville heat unit (SHU) in new mexican chile peppers. The goal is to understand how SHU is affected by looking at the following: 
 
@@ -67,7 +69,7 @@ The code is entirely based in R, using SQL to query environmental data.
 
 
 ### Installation Instructions
-Below are the 
+Below are the instructions to setup up and run the project locally:
 
 1. Clone the repo 
 
@@ -86,13 +88,19 @@ Below are the
 
 >:warning: **Do not change the file names within `Data`**: The code is dependent on the filenames remaining the same!
 
+### Running the Code
+Depending on your need for the code, how you will run it will vary. Here are some possible use cases:
+
+1. **Visualizing Data in App**: To run the RShiny application and view the data, graphs, and analysis without 
+interacting with the code, navigate to `app/` and select 
+2. **Contributing to Code**:
+3. :grey_exclamation: _**Updating in Real-Time** (not currently implemented)_:
+
 ## Data
 The LICOR data used in this project is proprietary and belongs to NMSU, if access is granted, researcher can follow the steps below to setup the project. 
 
-### Source Data
-Test
+### Data Sources
 
-### Data Acquisition
 
 ### Data Preprocessing
 

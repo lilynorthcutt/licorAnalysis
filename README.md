@@ -1,8 +1,26 @@
+![](https://github.com/lilynorthcutt/licorAnalysis/blob/main/img/cpi_img.png?raw=true)
+
 # Analysis of Pepper SHU in Response to Stress
 
 > _Understanding the world of spice_
 
 This project is a part of the New Mexico State (NMSU) Chile Pepper Institute's (CPI) research program. 
+
+**Table of Contents**
+
+- [About](#about)
+- [Usage](#usage)
+   * [Pre-Requisites](#pre-requisites)
+   * [Installation Instructions](#installation-instructions)
+- [Data](#data)
+   * [Source Data](#source-data)
+   * [Data Acquisition](#data-acquisition)
+   * [Data Preprocessing](#data-preprocessing)
+- [Code Structure](#code-structure)
+- [Results and Eval](#results-and-eval)
+- [Future Work](#future-work)
+- [Acknowledgements/References](#acknowledgementsreferences)
+- [License](#license)
 
 # About
 

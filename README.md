@@ -19,7 +19,7 @@
 </div>
 
 <details >
-<summary>**Table of Contents**</summary>
+<summary>__Table of Contents__</summary>
 
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
@@ -70,12 +70,19 @@ The code is entirely based in R, using SQL to query environmental data.
 Below are the 
 
 1. Clone the repo 
-```sh
-git clone https://github.com/lilynorthcutt/licorAnalysis.git
-```
+
+  ```bash
+  git clone https://github.com/lilynorthcutt/licorAnalysis.git
+  ```
 2. Request access to the LICOR project through Dr. Dennis Lozada. 
 3. Navigate to the files in the LICOR project and copy the `Data` folder
 4. Paste the `Data` folder into the main directory of the project
+<div align="center">
+</br>
+  <a href="https://github.com/lilynorthcutt/licorAnalysis">
+      <img src="img/data_structure.png" alt="data_setup" width="400" height="250" >
+  </a>
+</div>
 
 >:warning: **Do not change the file names within `Data`**: The code is dependent on the filenames remaining the same!
 

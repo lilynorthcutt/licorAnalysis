@@ -87,12 +87,9 @@ Below are the instructions to setup up and run the project locally:
 Depending on your need for the code, how you will run it will vary. Here are some possible use cases:
 
 1. **Visualizing Data in App**: To run the RShiny application and view the data, graphs, and analysis without 
-interacting with the code, navigate to the `app` folder, select `ui.R`, `server.R`, or `global.R`, and press
-<a href="https://github.com/lilynorthcutt/licorAnalysis">
-      <img src="img/run_app.png" alt="data_setup" width="70" height="20" >
-  </a>. You should now be able to play around with the interactive visualizations. 
-2. **Contributing to Code**:
-3._**Updating in Real-Time** (:grey_exclamation: not currently implemented)_:
+interacting with the code, navigate to the `app` folder, select `ui.R`, `server.R`, or `global.R`, and press `Run App`. You should now be able to play around with the interactive visualizations. 
+2. **Contributing to Code**: To add/modify how the data is read in, cleaning/wrangling, feature engineering or anything similar, access the `preprocessing.R` file. To edit the training process, add models, change parameters, or anything similar, access the `training.R` file. To modify/edit the model evaluation or anything similar, access the `results.R` file. The `main.R` file runs everything together, and the files in the RShiny app are found in the `app` folder. Finally, many functions that are used throughout the files previously mentioned can be found in the `funcs.R` file.
+3. _**Updating in Real-Time** (:grey_exclamation: not currently implemented)_: We would like to have the code setup such that we can directly input data collected the same day, and view results. This feature is not currently implemented.
 
 ## Data
 Much of the LICOR data used in this project is proprietary and belongs to NMSU, if access is granted, researcher must add the data locally to run the code. 

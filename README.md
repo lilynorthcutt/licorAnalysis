@@ -20,6 +20,7 @@
 
 <details >
 <summary>**Table of Contents**</summary>
+
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
    * [Pre-Requisites](#pre-requisites)

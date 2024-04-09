@@ -1,7 +1,8 @@
 packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc",
               "snakecase", "lubridate") 
 invisible(lapply(packages, require, character.only = TRUE ))
-source('funcs.R')
+source('src/funcs.R')
+
 ###############################################################################
 ## NOTES:
 # We have 4 data sources for this project. They are the following:
@@ -19,15 +20,20 @@ source('funcs.R')
 # Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent 
 # with other file, and removed extra row in one sheet
 ################################################################################
+#
 
+
+#
 ################################################################################
-#########                     LICOR DATA                               #########
+###                         Read in data sources                            ####
 ################################################################################
 
+# 1. LICOR #####################################################################
+ 
 ### Read in data
-fg_filepath <- 'Data/licor_fg_09052023.xlsx'
-ley09_filepath <- 'Data/licor_ley_09072023.xlsx'
-ley06_filepath <- 'Data/licor_ley_06202023.xlsx'
+fg_filepath <- 'Data/raw/Licor/licor_fg_09052023.xlsx'
+ley09_filepath <- 'Data/raw/Licor/licor_ley_09072023.xlsx'
+ley06_filepath <- 'Data/raw/Licor/licor_ley_06202023.xlsx'
 
 fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
   mutate(row_corrected = "R1",row = "R1") %>% rename(genotype = genotypes)
@@ -47,13 +53,14 @@ licor_df <- bind_rows(fabian_raw, ley09_raw) %>%
 ### Clean/Wrangle Data
 licor_df %<>% mutate(label23C = convert23CToChar(genotype))
 
-################################################################################
-#########                         SHU DATA                             #########
-################################################################################
+
+
+
+# 2. SHU #######################################################################
 
 ### Read in data
 
-hplcpath <- 'Data/hplcData.xlsx'
+hplcpath <- 'Data/raw/SHU/hplcData.xlsx'
 hplc_raw <- read_xlsx(path = hplcpath, sheet = 'shu')
 
 
@@ -92,5 +99,30 @@ hplc_df %<>% mutate(
   label23C = convert23CToChar(label23C)
 )
 
+
+# 3. HARVEST ###################################################################
+harvest_filepath <- 'Data/raw/Harvest/ALL_2023_ FIELDBOOKS.xlsx'
+harvest_ley_sheet <- 'GIP_FGarcia'
+harvest_fg_sheet <- 'GIP_LPSRC'
+
+harvest_raw_fg <- read_excel(path = harvest_filepath, sheet = harvest_fg_sheet, skip = 1)
+harvest_raw_ley <- read_excel(path = harvest_filepath, sheet = harvest_ley_sheet, skip = 1)
+
+# 4. ENIRONMENTAL/WEATHER ######################################################
+
+
+
+
+
+#
 ################################################################################
-rm(hplc_raw, fabian_raw, ley06_raw, ley09_raw)
+###                         Combine data sources                            ####
+################################################################################
+
+
+
+
+
+
+################################################################################
+rm(hplc_raw, fabian_raw, ley06_raw, ley09_raw, fg_filepath, hplcpath, ley06_filepath, ley09_filepath)

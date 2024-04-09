@@ -1,15 +1,27 @@
-![](https://github.com/lilynorthcutt/licorAnalysis/blob/main/img/cpi_img.png?raw=true)
+<!-- PROJECT LOGO AND INTRO SECTION -->
+<br />
+<div align="center">
+  <a href="https://github.com/lilynorthcutt/licorAnalysis">
+    <img src="img/cpi_img.png" alt="Logo" >
+  </a>
 
-# Analysis of Pepper SHU in Response to Stress
+  <h3 align="center">Analysis of Pepper SHU in Response to Stress</h3>
 
-> _Understanding the world of spice_
+  <p align="center">
+    This project is a part of the New Mexico State (NMSU) Chile Pepper Institute's (CPI) research program, and is        built in R to understand underlying relationships between stress and capsaicin content in New Mexico.
+    <br />
+    <br />
+    <a href="https://cpi.nmsu.edu">CPI Homepage</a> 
+    ·
+    <a href="https://chilebreeding.nmsu.edu/index.html">Chile Breeding Program</a>
+  </p>
+  
+</div>
 
-This project is a part of the New Mexico State (NMSU) Chile Pepper Institute's (CPI) research program. 
-
-**Table of Contents**
-
-- [About](#about)
-- [Usage](#usage)
+<details >
+<summary>**Table of Contents**</summary>
+- [About The Project](#about-the-project)
+- [Getting Started](#getting-started)
    * [Pre-Requisites](#pre-requisites)
    * [Installation Instructions](#installation-instructions)
 - [Data](#data)
@@ -21,39 +33,68 @@ This project is a part of the New Mexico State (NMSU) Chile Pepper Institute's (
 - [Future Work](#future-work)
 - [Acknowledgements/References](#acknowledgementsreferences)
 - [License](#license)
+</details>
 
-# About
 
-We are looking at plant porometry, fluorometry, plant yield/maturity, and environmental factor data to gain better insight into the scoville heat unit (SHU) in new mexican chile peppers.The goal is to understand how SHU is affected by: (1) environmental data such as weather and altitude, (2) the plants stress response (taken using LICOR LI600), (3) the quality of yield - fruit weight, color, fruit maturity, yield quantity. Understanding these relationships will better aid farmers and researchers in all of their spicy endeavors, whether it be breeding the worlds hottest pepper, or simply maintaining a constant heat level in their harvest.
 
-# Usage
+
+
+<!-- About The Project -->
+## About The Project
+
+We are looking at plant porometry, fluorometry, plant yield/maturity, and environmental factor data to gain better insight into the scoville heat unit (SHU) in new mexican chile peppers. The goal is to understand how SHU is affected by looking at the following: 
+
+* Environmental data such as weather and altitude
+* The plants stress response (taken using LICOR LI600)
+* The quality of yield - fruit weight, color, fruit maturity, yield quantity. 
+
+Understanding these relationships will better aid farmers and researchers in all of their spicy endeavors, whether it be breeding the worlds hottest pepper, or simply maintaining a constant heat level in their harvest.
+
+
+
+
+<!-- GETTING STARTED -->
+## Getting Started
 
 This project is fairly contained, with minimal setup. However, due to the proprietary nature of the data, the data is not stored on  github. The instructions for NMSU CPI researchers data access is described below.
 
-## Pre-Requisites
+### Pre-Requisites
 The code is entirely based in R, using SQL to query environmental data.
 
 - **Editor Used**: RStudio version 2023.12.1
 - **R Version**: R version 4.3.3
 
-## Installation Instructions
 
+### Installation Instructions
+Below are the 
 
-# Data
+1. Clone the repo 
+```sh
+git clone https://github.com/lilynorthcutt/licorAnalysis.git
+```
+2. Request access to the LICOR project through Dr. Dennis Lozada. 
+3. Navigate to the files in the LICOR project and copy the `Data` folder
+4. Paste the `Data` folder into the main directory of the project
+
+>:warning: **Do not change the file names within `Data`**: The code is dependent on the filenames remaining the same!
+
+## Data
 The LICOR data used in this project is proprietary and belongs to NMSU, if access is granted, researcher can follow the steps below to setup the project. 
-## Source Data
 
-## Data Acquisition
+### Source Data
+Test
 
-## Data Preprocessing
+### Data Acquisition
 
-# Code Structure
+### Data Preprocessing
 
-# Results and Eval
+## Code Structure
 
-# Future Work
+## Results and Eval
 
-# Acknowledgements/References
+## Future Work
 
-# License
+## Acknowledgements/References
+
+## License
 

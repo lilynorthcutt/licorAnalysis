@@ -25,9 +25,9 @@ source('funcs.R')
 ################################################################################
 
 ### Read in data
-fg_filepath <- 'Data/GIP_F_Ibrar_2023_07_19T11_41_54_703Z_1.xlsx'
-ley09_filepath <- 'Data/GIP_LYND2_IBRAR_2023_09_08T12_23_07_444Z_1.xlsx'
-ley06_filepath <- 'Data/GIP-DATA_lynd.xlsx'
+fg_filepath <- 'Data/licor_fg_09052023.xlsx'
+ley09_filepath <- 'Data/licor_ley_09072023.xlsx'
+ley06_filepath <- 'Data/licor_ley_06202023.xlsx'
 
 fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
   mutate(row_corrected = "R1",row = "R1") %>% rename(genotype = genotypes)

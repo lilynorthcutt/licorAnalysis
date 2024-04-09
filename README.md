@@ -20,8 +20,8 @@
   
 </div>
 
-<details >
-<summary>__Table of Contents__</summary>
+<details open>
+<summary>Table of Contents</summary>
 
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
@@ -30,12 +30,7 @@
    * [Running the Code](#running-the-code)
 - [Data](#data)
    * [Data Sources](#data-sources)
-   * [Data Preprocessing](#data-preprocessing)
-- [Code Structure](#code-structure)
-- [Results and Eval](#results-and-eval)
-- [Future Work](#future-work)
 - [Acknowledgements/References](#acknowledgementsreferences)
-- [License](#license)
 </details>
 
 
@@ -92,25 +87,35 @@ Below are the instructions to setup up and run the project locally:
 Depending on your need for the code, how you will run it will vary. Here are some possible use cases:
 
 1. **Visualizing Data in App**: To run the RShiny application and view the data, graphs, and analysis without 
-interacting with the code, navigate to `app/` and select 
+interacting with the code, navigate to the `app` folder, select `ui.R`, `server.R`, or `global.R`, and press
+<a href="https://github.com/lilynorthcutt/licorAnalysis">
+      <img src="img/run_app.png" alt="data_setup" width="70" height="20" >
+  </a>. You should now be able to play around with the interactive visualizations. 
 2. **Contributing to Code**:
-3. :grey_exclamation: _**Updating in Real-Time** (not currently implemented)_:
+3._**Updating in Real-Time** (:grey_exclamation: not currently implemented)_:
 
 ## Data
-The LICOR data used in this project is proprietary and belongs to NMSU, if access is granted, researcher can follow the steps below to setup the project. 
+Much of the LICOR data used in this project is proprietary and belongs to NMSU, if access is granted, researcher must add the data locally to run the code. 
 
 ### Data Sources
+This project uses four data sources:
+
+1. **Porometry/Fluorometry Data**: Using <a href="https://www.licor.com/env/products/LI-600/">LI-COR LI-600</a> data, such as stomatal conductance, transpiration, leaf vapor pressure, fluorescence, etc. is collected. A full data dictionary of LI-600 output can be found <a href="https://www.licor.com/env/support/LI-600/topics/data-file-descriptions.html#Datafilestructure">here</a>. Data was collected at 2 different locations on 3 separate days for 20 genotypes for 3 replications. _Additional information is located in the powerpoint found under `Project Overview and Status/LICOR Project Overview.pptx`.
+2. **Scoville Heat Unit (SHU) Data**: Peppers from 5 different plants in each replication for each genotype at both locations are sampled, dried, ground, and assessed by high-performance liquid chromatography (HPLC) to quantitatively measure SHU. 
+3. **Harvest Data**: At the time of harvesting mature fruit, additional data is taken by researchers. This includes number of plants harvested, harvest date, yield (mature vs. non-mature), and pod weight. 
+4. **Environmental Data**: Weather data and environmental factors are our fourth and final data source. The data is queried using the National Weather Service's API, more information can be found <a href="https://www.weather.gov/documentation/services-web-api">here</a>.
 
 
-### Data Preprocessing
-
-## Code Structure
-
-## Results and Eval
-
-## Future Work
 
 ## Acknowledgements/References
+Thank you to the folks on the <a href="https://chilebreeding.nmsu.edu/team.html">Spicy Team</a> at NMSU CPI for their diligent and thorough assistance in
+collecting and preparing data for this project. Without their contributions this project would not be possible.
 
-## License
-
+<div align="center">
+  </br>
+  </br>
+  </br>
+  <a href="https://github.com/lilynorthcutt/licorAnalysis">
+    <img src="img/nmsu_seal.png" alt="Logo" width = 100 height = 100>
+  </a>
+</div>

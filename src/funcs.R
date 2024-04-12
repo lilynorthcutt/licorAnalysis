@@ -57,6 +57,15 @@ readLicorData <- function(filepath, location){
 }
 
 ## HARVEST #####################################################################
+getDfWithoutCols <- function(df, cols_filter_out){
+  'Function that gives us the dataframe WITHOUT any columns that contain and strings in the cols_to_pivot list'
+  
+  selected_indices <- grep(paste(cols_filter_out, collapse = "|"), colnames(df))
+  df_filtered <- df[, -selected_indices]
+  
+  return(df_filtered)
+}
+                               
 pivotLongerColumn <- function(df, name, grouping_cols){
   'Function to pivot longer a specific set of columns'
   
@@ -85,8 +94,8 @@ pivotLongerPlantData <- function(df, cols_to_pivot, grouping_cols ){
     - grouping_cols: columns that are needed for merging
   Returns full pivoted longer dataframe '
   
-  selected_indices_pivot <- grep(paste(cols_to_pivot, collapse = "|"), colnames(df))
-  df_without_pivots <- df[, -selected_indices_pivot]
+  
+  df_without_pivots <- getDfWithoutCols(df, cols_to_pivot )
   
   result_list <- lapply(cols_to_pivot, function(x) pivotLongerColumn(df, x, grouping_cols))
   final_result <- Reduce(function(x, y) merge(x, y, by = c(grouping_cols, "plant_num_in_rep")), result_list) %>% 

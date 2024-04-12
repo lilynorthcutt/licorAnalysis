@@ -1,5 +1,5 @@
 packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc",
-              "snakecase", "lubridate") 
+              "snakecase", "lubridate", "plyr") 
 invisible(lapply(packages, require, character.only = TRUE ))
 source('src/funcs.R')
 
@@ -122,8 +122,14 @@ colnames(harvest_raw_fg) <- to_any_case(colnames(harvest_raw_fg))
 colnames(harvest_raw_ley) <- to_any_case(colnames(harvest_raw_ley)) 
 
 # Remove columns that are all NA
-harvest_raw_fg %<>% select(-findNACols(harvest_raw_fg)) %>% rename(label23C  = "23_c")
-harvest_raw_ley %<>% select(-findNACols(harvest_raw_ley)) %>% rename(label23C  = "23_c")
+harvest_raw_fg %<>% select(-findNACols(harvest_raw_fg)) %>% dplyr::rename(label23C  = "23_c")
+harvest_raw_ley %<>% select(-findNACols(harvest_raw_ley)) %>% dplyr::rename(label23C  = "23_c")
+
+# Rename columns that represent the same thing s.t. they are the same in both dfs
+harvest_raw_ley %<>% dplyr::rename(yield = yield_kg, 
+                            red_yield = red_yield_kg,
+                            green_yield = green_yield_kg,
+                            "10_fruit_weight_kg" = "10_pod_weight_kg") 
 
 # Remove columns we are not interested in 
 rm_cols_univ <- c("no", "plot_score_july_5", "plot_score_june_9", "plot_score_june_26", 
@@ -189,8 +195,23 @@ checkDates(harvest_ley)
 
 # Create summary dataframe, with all of the columns, except that height, width, 
 # height_to_first_bifurcation and no_of_basal_branches are averages (with stdevs)
+harvest_fg_summary <- harvest_fg %>% dplyr::group_by(label23C, rep, .add = FALSE) %>% 
+  dplyr::summarise(avg_height = mean(plant_height, na.rm = T),
+            avg_width = mean(plant_width, na.rm = T),
+            avg_height_to_first_bifurcation = mean(height_to_first_bifurcation, na.rm = T),
+            avg_no_of_basal_branches = mean(no_of_basal_branches, na.rm = T)) %>% 
+  ungroup() %>% merge(getDfWithoutCols(harvest_raw_fg, cols_to_pivot) , by = c("label23C", "rep"))
 
+harvest_ley_summary <- harvest_ley %>% dplyr::group_by(label23C, rep) %>% 
+  dplyr::summarise(avg_height = mean(plant_height, na.rm = T),
+            avg_width = mean(plant_width, na.rm = T),
+            avg_height_to_first_bifurcation = mean(height_to_first_bifurcation, na.rm = T),
+            avg_no_of_basal_branches = mean(no_of_basal_branches, na.rm = T)
+  ) %>% ungroup() %>% merge(getDfWithoutCols(harvest_raw_ley, cols_to_pivot) , by = c("label23C", "rep"))
 
+# Combine by location
+harvest_all <- plyr::rbind.fill(harvest_fg, harvest_ley)
+harvest_summary <- plyr::rbind.fill(harvest_fg_summary, harvest_ley_summary)
 
 # 4. ENIRONMENTAL/WEATHER ######################################################
 

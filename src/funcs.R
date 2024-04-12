@@ -1,12 +1,31 @@
-#################################################
-#################################################
-###                                           ###
-###         PREPROCESSING FUNCTIONS           ###         
-###                                           ###
-#################################################
-#################################################
+#          #################################################                   #
+#          #################################################                   #
+#          ###                                           ###                   #
+#          ###         PREPROCESSING FUNCTIONS           ###                   #         
+#          ###                                           ###                   #
+#          #################################################                   #
+#          #################################################                   #
+convert23CToChar <- function(gbs){
+  'Function that converts a gbs to string (if originally numeric)
+  NOTE - GBS convention states that all GBS numbers have 3 characters,
+  if the number is less that 100, then the missing space will be filled in by 0.
+  For example: 10 -> GBS010'
+  
+  gbs %<>% as.character() %>% case_when(
+    nchar(.) == 1 ~paste0("00", .),
+    nchar(.) == 2 ~paste0("0", .),
+    .default =.
+  )
+  return(gbs)
+}
 
-## LICOR Functions
+findNACols <- function(df){
+  'Return column names of columns that are all NA '
+  numNa <- colSums(is.na(df))
+  return(colnames(df[numNa==nrow(df)]))
+}
+
+## LICOR Functions #############################################################
 readSheetWData <- function(filepath, sheet){
   'Function to read in sheet of specified file of LICOR data
   Returns dataframe with appropriate column names'
@@ -37,16 +56,4 @@ readLicorData <- function(filepath, location){
   return(df %>% data.frame() )
 }
 
-convert23CToChar <- function(gbs){
-  'Function that converts a gbs to string (if originally numeric)
-  NOTE - GBS convention states that all GBS numbers have 3 characters,
-  if the number is less that 100, then the missing space will be filled in by 0.
-  For example: 10 -> GBS010'
-  
-  gbs %<>% as.character() %>% case_when(
-    nchar(.) == 1 ~paste0("00", .),
-    nchar(.) == 2 ~paste0("0", .),
-    .default =.
-  )
-  return(gbs)
-}
+## HARVEST #####################################################################

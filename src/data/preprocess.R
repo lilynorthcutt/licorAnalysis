@@ -101,12 +101,44 @@ hplc_df %<>% mutate(
 
 
 # 3. HARVEST ###################################################################
+
+### Read in data
 harvest_filepath <- 'Data/raw/Harvest/ALL_2023_ FIELDBOOKS.xlsx'
 harvest_ley_sheet <- 'GIP_FGarcia'
 harvest_fg_sheet <- 'GIP_LPSRC'
 
-harvest_raw_fg <- read_excel(path = harvest_filepath, sheet = harvest_fg_sheet, skip = 1)
-harvest_raw_ley <- read_excel(path = harvest_filepath, sheet = harvest_ley_sheet, skip = 1)
+harvest_raw_fg <- read_excel(path = harvest_filepath, sheet = harvest_fg_sheet, skip = 1) 
+harvest_raw_ley <- read_excel(path = harvest_filepath, sheet = harvest_ley_sheet, skip = 1) 
+
+
+### Clean Data
+# Snakecase all columns
+colnames(harvest_raw_fg) <- to_any_case(colnames(harvest_raw_fg)) 
+colnames(harvest_raw_ley) <- to_any_case(colnames(harvest_raw_ley)) 
+
+# Remove columns that are all NA
+harvest_raw_fg %<>% select(-findNACols(harvest_raw_fg)) %>% rename(label23C  = "23_c")
+harvest_raw_ley %<>% select(-findNACols(harvest_raw_ley)) %>% rename(label23C  = "23_c")
+
+# Columns that are summary/same for all 5 plants in each replication
+highlevelCols <- c("date_harvested", "plants_harvested", "yield_kg", 
+                   "red_yield_kg", "green_yield_kg", "10_pod_weight_kg" )
+
+# Pivot longer columns 
+# Ex: [plantheight_1, plantheight_2, plantheight_3] => [plantNum, height] )
+harvest_raw_fg %>% group_by(label23C, rep) %>% summarise(n = n()) 
+
+
+df <- harvest_raw_fg
+name <- "plant_height"
+grouping_cols <- c("label23C", "rep")
+
+
+cols_to_condense <- colnames(df[grepl(name,colnames(df))])
+selectedDf <- harvest_raw_fg %>% select(all_of(grouping_cols), all_of(cols_to_condense)) %>% 
+  pivot_longer(!all_of(grouping_cols), names_to = "plant_num_in_rep", values_to = name)
+
+
 
 # 4. ENIRONMENTAL/WEATHER ######################################################
 

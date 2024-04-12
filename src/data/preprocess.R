@@ -18,7 +18,12 @@ source('src/funcs.R')
 # 
 
 # Notes for Ibrar : changed GIP-DATA_lynd.xlsx s.t. sheet names were consistent 
-# with other file, and removed extra row in one sheet
+# with other file, and removed extra row in one sheet.
+# Edited two errors within the "date harvested" column: 
+#   1. @Ley 23C096 rep 1: 09.22.23 => 09.22.2023
+#   2. @FG 23C090 rep 3: 10.13.2033 => 10.13.2023
+# Changed no_basal_branches NA -> 0 for 23C104 rep 2 @Ley
+
 ################################################################################
 #
 
@@ -104,10 +109,10 @@ hplc_df %<>% mutate(
 
 ### Read in data
 harvest_filepath <- 'Data/raw/Harvest/ALL_2023_ FIELDBOOKS.xlsx'
-harvest_ley_sheet <- 'GIP_FGarcia'
-harvest_fg_sheet <- 'GIP_LPSRC'
+harvest_fg_sheet <- 'GIP_FGarcia'
+harvest_ley_sheet <- 'GIP_LPSRC'
 
-harvest_raw_fg <- read_excel(path = harvest_filepath, sheet = harvest_fg_sheet, skip = 1) 
+harvest_raw_fg <- read_excel(path = harvest_filepath, sheet = harvest_fg_sheet, skip = 1)
 harvest_raw_ley <- read_excel(path = harvest_filepath, sheet = harvest_ley_sheet, skip = 1) 
 
 
@@ -120,23 +125,70 @@ colnames(harvest_raw_ley) <- to_any_case(colnames(harvest_raw_ley))
 harvest_raw_fg %<>% select(-findNACols(harvest_raw_fg)) %>% rename(label23C  = "23_c")
 harvest_raw_ley %<>% select(-findNACols(harvest_raw_ley)) %>% rename(label23C  = "23_c")
 
-# Columns that are summary/same for all 5 plants in each replication
-highlevelCols <- c("date_harvested", "plants_harvested", "yield_kg", 
-                   "red_yield_kg", "green_yield_kg", "10_pod_weight_kg" )
+# Remove columns we are not interested in 
+rm_cols_univ <- c("no", "plot_score_july_5", "plot_score_june_9", "plot_score_june_26", 
+                  "plot_score_july_11", "remove_col")
+harvest_raw_fg %<>% select(-any_of(rm_cols_univ)) 
+harvest_raw_ley %<>% select(-any_of(rm_cols_univ)) 
+
+# Create cols to condense different ones in FG an Ley
+# FG has cols "transplants with flowers" and "transplants with fruit" this 
+#   represents # of transplanted plants with each
+# Ley has cols "number of flowers" and "number of fruits" this represents # of 
+#   each in TOTAL in all the transplanted plants 
+# Because we cannot infer one for the other, to merge dataframes and columns we
+# will create new columns (boolean) to represent whether fruits/flowers exist at all on the plants
+harvest_raw_ley %<>%  mutate(
+  fruits_on_transplant = case_when(
+    transplants_with_fruits >0 ~1,
+    T ~0
+  ),
+  flowers_on_transplant = case_when(
+    transplants_with_flowers > 0 ~1,
+    T ~0
+  )) #%>% select(-transplants_with_fruits, -transplants_with_flowers )
+
+harvest_raw_fg %<>%  mutate(
+  fruits_on_transplant = case_when(
+    no_of_fruits >0 ~1,
+    T ~0
+  ),
+  flowers_on_transplant = case_when(
+    no_of_floweers > 0 ~1,
+    T ~0
+  )) #%>% select(-transplants_with_fruits, -transplants_with_flowers )
+
 
 # Pivot longer columns 
 # Ex: [plantheight_1, plantheight_2, plantheight_3] => [plantNum, height] )
-harvest_raw_fg %>% group_by(label23C, rep) %>% summarise(n = n()) 
-
-
-df <- harvest_raw_fg
-name <- "plant_height"
+cols_to_pivot <- c("plant_height", "plant_width", "height_to_first_bifurcation",
+                   "no_of_basal_branches")
 grouping_cols <- c("label23C", "rep")
 
+harvest_fg <- pivotLongerPlantData(harvest_raw_fg, cols_to_pivot , grouping_cols ) 
+harvest_ley <- pivotLongerPlantData(harvest_raw_ley, cols_to_pivot , grouping_cols ) 
 
-cols_to_condense <- colnames(df[grepl(name,colnames(df))])
-selectedDf <- harvest_raw_fg %>% select(all_of(grouping_cols), all_of(cols_to_condense)) %>% 
-  pivot_longer(!all_of(grouping_cols), names_to = "plant_num_in_rep", values_to = name)
+# Housekeeping before merging (changing label 23C to char, adding transplant date+location)
+harvest_ley %<>% rowwise() %>% 
+  mutate(transplanted_date = as.Date("04/26/2023", format = "%m/%d/%Y"),
+         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
+         days_from_t_to_h = date_harvested - transplanted_date,
+         label23C = convert23CToChar(label23C),
+         location = "Leyendecker"
+           )
+
+harvest_fg %<>% rowwise() %>% 
+  mutate(transplanted_date = as.Date("04/27/2023", format = "%m/%d/%Y"),
+         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
+         days_from_t_to_h = date_harvested - transplanted_date,
+         label23C = convert23CToChar(label23C),
+         location = "Fabian"
+  )
+checkDates(harvest_fg)
+checkDates(harvest_ley)
+
+# Create summary dataframe, with all of the columns, except that height, width, 
+# height_to_first_bifurcation and no_of_basal_branches are averages (with stdevs)
 
 
 

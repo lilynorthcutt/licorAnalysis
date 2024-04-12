@@ -3,7 +3,10 @@ source("preprocess.R")
 #####################
 ### Visualize Data
 #####################
+# 1. LICOR #####################################################################
 
+
+# 2. SHU #######################################################################
 genoList <- unique(hplcRaw$label23C)
 geno <- genoList[1]
 
@@ -56,4 +59,10 @@ ggplot(hplcDf) +
 ggplot(hplcDf) + 
   geom_histogram(aes(x = hplc), binwidth = 550)+
   facet_wrap(.~location, nrow =2)
+
+
+# 3. HARVEST ###################################################################
+# Look at # fruits / flowers vs harvesting date/harvest data
+
+
 

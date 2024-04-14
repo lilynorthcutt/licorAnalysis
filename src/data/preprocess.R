@@ -41,7 +41,7 @@ ley09_filepath <- 'Data/raw/Licor/licor_ley_09072023.xlsx'
 ley06_filepath <- 'Data/raw/Licor/licor_ley_06202023.xlsx'
 
 fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
-  mutate(row_corrected = "R1",row = "R1") %>% rename(genotype = genotypes)
+  mutate(row_corrected = "R1",row = "R1") %>% dplyr::rename(genotype = genotypes)
 ley09_raw <- readLicorData(ley09_filepath, "Leyendecker") 
 ley06_raw <- readLicorData(ley06_filepath, "Leyendecker") %>% 
   mutate(time = parse_date_time(time, '%H:%M:%S'),
@@ -71,7 +71,7 @@ hplc_raw <- read_xlsx(path = hplcpath, sheet = 'shu')
 
 ### Clean/Wrangle Data
 # Handle non numeric HPLC values
-hplc_df <- hplc_raw %>% rename(hplcRaw = hplc) %>% mutate(
+hplc_df <- hplc_raw %>% dplyr::rename(hplcRaw = hplc) %>% mutate(
   hplc = as.numeric(hplcRaw)
 )
 #print((hplc_df %>% filter(is.na(hplc)))$hplcRaw)
@@ -89,10 +89,6 @@ hplc_df %<>% mutate(
   name = as.character(name),
   location = as.character(location),
   replication = as.numeric(replication),
-  # Each genotype has 1 to 6 samples. 
-  # Number them, and flag if there is an outlier
-  sampleCount = row_number(),
-  #outlier = outlierCheck(hplc)
   shuLabel = case_when(
     shu <= 2000 ~ "Mild",
     (shu <= 5000 & shu > 2000) ~"Hot",
@@ -230,4 +226,5 @@ harvest_summary <- plyr::rbind.fill(harvest_fg_summary, harvest_ley_summary)
 
 
 ################################################################################
-rm(hplc_raw, fabian_raw, ley06_raw, ley09_raw, fg_filepath, hplcpath, ley06_filepath, ley09_filepath)
+rm(hplc_raw, fabian_raw, ley06_raw, ley09_raw, fg_filepath, hplcpath, ley06_filepath, ley09_filepath,
+   harvest_fg, harvest_fg_summary, harvest_ley, harvest_ley_summary, harvest_raw_fg, harvest_raw_ley)

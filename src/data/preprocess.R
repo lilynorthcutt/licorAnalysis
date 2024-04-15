@@ -23,6 +23,7 @@ source('src/funcs.R')
 #   1. @Ley 23C096 rep 1: 09.22.23 => 09.22.2023
 #   2. @FG 23C090 rep 3: 10.13.2033 => 10.13.2023
 # Changed no_basal_branches NA -> 0 for 23C104 rep 2 @Ley
+# NEED TO DO: get 23C109 gbs and name
 
 ################################################################################
 #

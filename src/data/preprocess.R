@@ -41,7 +41,8 @@ ley09_filepath <- 'Data/raw/Licor/licor_ley_09072023.xlsx'
 ley06_filepath <- 'Data/raw/Licor/licor_ley_06202023.xlsx'
 
 fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
-  mutate(row_corrected = "R1",row = "R1") %>% dplyr::rename(genotype = genotypes)
+  mutate(row_corrected = "R1",row = "R1") %>% 
+  dplyr::rename(genotype = genotypes)
 ley09_raw <- readLicorData(ley09_filepath, "Leyendecker") 
 ley06_raw <- readLicorData(ley06_filepath, "Leyendecker") %>% 
   mutate(time = parse_date_time(time, '%H:%M:%S'),
@@ -56,15 +57,32 @@ licor_df <- bind_rows(fabian_raw, ley09_raw) %>%
   bind_rows(ley06_raw ) 
 
 ### Clean/Wrangle Data
-licor_df %<>% mutate(label23C = convert23CToChar(genotype))
+
+# Make cols consistent with other data sources
+licor_df %<>% dplyr::rename(label23C = genotype) %>% mutate(
+  label23C = convert23CToChar(label23C),
+  rep = case_when(
+    row_corrected=="R1" ~1,
+    row_corrected=="R2" ~2,
+    T ~3
+  )
+  )
+
+# Make avg time by label23C, rep, location, and date column
+
+# Remove columns we don't want
+rm_cols <- c("row_corrected", "obs", "config_name", 
+                     "config_author", "remark", "na", "row")
+licor_df %<>% select(-all_of(rm_cols)) %>% select("label23C", "location","rep", everything())
 
 
-
+# Create summary dataframe - average by label23C, location, and rep for all features
+licor_df_summary <- licor_df %>% dplyr::group_by(label23C, rep, location, date) %>% 
+  dplyr::summarise_if(is.numeric , mean)
 
 # 2. SHU #######################################################################
 
 ### Read in data
-
 hplcpath <- 'Data/raw/SHU/hplcData.xlsx'
 hplc_raw <- read_xlsx(path = hplcpath, sheet = 'shu')
 
@@ -97,8 +115,30 @@ hplc_df %<>% mutate(
     T ~"Superhot"
   ),
   shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot")),
-  label23C = convert23CToChar(label23C)
+  label23C = convert23CToChar(label23C),
+  location = case_when(
+    location == "Leyendecker" ~"Leyendecker",
+    T ~"Fabian")
 )
+
+# Make all columns uniform between data sources
+hplc_df %<>% dplyr::rename(rep = replication) %>% 
+  mutate(label23C = convert23CToChar(label23C))
+
+# Clean up cases where we have 2 samples for one group (rep, location, label23C)
+# note - each gbs and name are specific for label23C
+hplc_df_summary <- hplc_df %>% dplyr::group_by(label23C, gbs, name, location, rep) %>% 
+  dplyr::summarise(shu = mean(shu, na.rm = T)) %>% mutate(
+    shuLabel = case_when(
+      shu <= 2000 ~ "Mild",
+      (shu <= 5000 & shu > 2000) ~"Hot",
+      (shu <= 250000 & shu > 5000) ~"Very Hot",
+      (shu <= 1000000 & shu > 250000) ~"Extremely Hot",
+      T ~"Superhot"
+    ),
+    shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot"))
+  )
+
 
 
 # 3. HARVEST ###################################################################
@@ -116,6 +156,7 @@ harvest_raw_ley <- read_excel(path = harvest_filepath, sheet = harvest_ley_sheet
 # Snakecase all columns
 colnames(harvest_raw_fg) <- to_any_case(colnames(harvest_raw_fg)) 
 colnames(harvest_raw_ley) <- to_any_case(colnames(harvest_raw_ley)) 
+
 
 # Remove columns that are all NA
 harvest_raw_fg %<>% select(-findNACols(harvest_raw_fg)) %>% dplyr::rename(label23C  = "23_c")
@@ -160,6 +201,25 @@ harvest_raw_fg %<>%  mutate(
     T ~0
   )) #%>% select(-transplants_with_fruits, -transplants_with_flowers )
 
+# Housekeeping before merging (changing label 23C to char, adding transplant date+location)
+harvest_raw_ley %<>% rowwise() %>% 
+  mutate(transplanted_date = as.Date("04/26/2023", format = "%m/%d/%Y"),
+         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
+         days_from_t_to_h = date_harvested - transplanted_date,
+         label23C = convert23CToChar(label23C),
+         location = "Leyendecker"
+  )
+
+harvest_raw_fg %<>% rowwise() %>% 
+  mutate(transplanted_date = as.Date("04/27/2023", format = "%m/%d/%Y"),
+         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
+         days_from_t_to_h = date_harvested - transplanted_date,
+         label23C = convert23CToChar(label23C),
+         location = "Fabian"
+  )
+checkDates(harvest_raw_fg)
+checkDates(harvest_raw_ley)
+
 
 # Pivot longer columns 
 # Ex: [plantheight_1, plantheight_2, plantheight_3] => [plantNum, height] )
@@ -170,24 +230,6 @@ grouping_cols <- c("label23C", "rep")
 harvest_fg <- pivotLongerPlantData(harvest_raw_fg, cols_to_pivot , grouping_cols ) 
 harvest_ley <- pivotLongerPlantData(harvest_raw_ley, cols_to_pivot , grouping_cols ) 
 
-# Housekeeping before merging (changing label 23C to char, adding transplant date+location)
-harvest_ley %<>% rowwise() %>% 
-  mutate(transplanted_date = as.Date("04/26/2023", format = "%m/%d/%Y"),
-         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
-         days_from_t_to_h = date_harvested - transplanted_date,
-         label23C = convert23CToChar(label23C),
-         location = "Leyendecker"
-           )
-
-harvest_fg %<>% rowwise() %>% 
-  mutate(transplanted_date = as.Date("04/27/2023", format = "%m/%d/%Y"),
-         date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
-         days_from_t_to_h = date_harvested - transplanted_date,
-         label23C = convert23CToChar(label23C),
-         location = "Fabian"
-  )
-checkDates(harvest_fg)
-checkDates(harvest_ley)
 
 # Create summary dataframe, with all of the columns, except that height, width, 
 # height_to_first_bifurcation and no_of_basal_branches are averages (with stdevs)
@@ -196,18 +238,21 @@ harvest_fg_summary <- harvest_fg %>% dplyr::group_by(label23C, rep, .add = FALSE
             avg_width = mean(plant_width, na.rm = T),
             avg_height_to_first_bifurcation = mean(height_to_first_bifurcation, na.rm = T),
             avg_no_of_basal_branches = mean(no_of_basal_branches, na.rm = T)) %>% 
-  ungroup() %>% merge(getDfWithoutCols(harvest_raw_fg, cols_to_pivot) , by = c("label23C", "rep"))
+  ungroup() %>% merge(getDfWithoutCols(harvest_raw_fg, cols_to_pivot) , by = c("label23C", "rep"), all = TRUE) 
+
 
 harvest_ley_summary <- harvest_ley %>% dplyr::group_by(label23C, rep) %>% 
   dplyr::summarise(avg_height = mean(plant_height, na.rm = T),
             avg_width = mean(plant_width, na.rm = T),
             avg_height_to_first_bifurcation = mean(height_to_first_bifurcation, na.rm = T),
             avg_no_of_basal_branches = mean(no_of_basal_branches, na.rm = T)
-  ) %>% ungroup() %>% merge(getDfWithoutCols(harvest_raw_ley, cols_to_pivot) , by = c("label23C", "rep"))
+  ) %>% ungroup() %>% 
+  merge(getDfWithoutCols(harvest_raw_ley, cols_to_pivot) , by = c("label23C", "rep"), all = TRUE) 
 
 # Combine by location
 harvest_all <- plyr::rbind.fill(harvest_fg, harvest_ley)
 harvest_summary <- plyr::rbind.fill(harvest_fg_summary, harvest_ley_summary)
+
 
 # 4. ENIRONMENTAL/WEATHER ######################################################
 
@@ -216,13 +261,27 @@ harvest_summary <- plyr::rbind.fill(harvest_fg_summary, harvest_ley_summary)
 
 
 #
+
 ################################################################################
 ###                         Combine data sources                            ####
 ################################################################################
 
+# 1. Check all df meet criteria for merge ######################################
+# licor_df
+# Currently the licor_df data for location == 'Fabian' is not broken up into replications
+# to do: work with ibrar on best way to handle this - currently looking at ONLY Leyendecker
+licor_df_ley <- licor_df %>% filter(location == "Leyendecker")
+
+# hplc_df
+hplc_df_summary_ley <- hplc_df_summary %>% filter(location == "Leyendecker")
 
 
+# harvest_summary
+# check
+harvest_summary_ley <- harvest_summary %>% filter(location == "Leyendecker")
 
+
+# 2. Merge all df ##############################################################
 
 
 ################################################################################

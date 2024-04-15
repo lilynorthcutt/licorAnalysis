@@ -128,3 +128,32 @@ checkDates <- function(df){
   }
   
 }
+
+## COMBINE #####################################################################
+grouping_cols <- c("label23C", "rep", "location")
+
+checkReadyToCombine <- function(df, grouping_cols){
+  'Function to check all dataframes to make sure they are ready to be combined.
+  Checks they have required columns for merging, checks that there is only one row per 
+  groued column, and checks that the values in the merging column are correct
+  
+  Returns boolean - true if ready for merging, false if not ready yet'
+  
+  # Check required columns are in df
+  
+  # Check each unique grouping has only 1 row
+  notUnique <- df %>% dplyr::group_by(label23C, rep, location) %>% dplyr::summarise(n = n()) %>% filter(n>1)
+  
+  # Check values in merging column are correct
+}
+
+
+
+
+
+
+
+
+
+
+#

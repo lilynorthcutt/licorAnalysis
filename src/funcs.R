@@ -46,7 +46,7 @@ readLicorData <- function(filepath, location){
   sheetnames <- excel_sheets(filepath)
   df <- lapply(set_names(sheetnames, sheetnames),
                function(x) readSheetWData(filepath, x)) %>% 
-    bind_rows(.id = "row_corrected")  %>% 
+    bind_rows(.id = "rep_corrected")  %>% 
     mutate(location = location)
   
   # Convert colnames to snake_case

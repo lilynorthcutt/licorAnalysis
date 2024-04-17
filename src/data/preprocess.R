@@ -42,7 +42,7 @@ ley09_filepath <- 'Data/raw/Licor/licor_ley_09072023.xlsx'
 ley06_filepath <- 'Data/raw/Licor/licor_ley_06202023.xlsx'
 
 fabian_raw <- readLicorData(fg_filepath, "Fabian")  %>% 
-  mutate(row_corrected = "R1",row = "R1") %>% 
+  mutate(rep_corrected = rep) %>% 
   dplyr::rename(genotype = genotypes)
 ley09_raw <- readLicorData(ley09_filepath, "Leyendecker") 
 ley06_raw <- readLicorData(ley06_filepath, "Leyendecker") %>% 
@@ -63,8 +63,8 @@ licor_df <- bind_rows(fabian_raw, ley09_raw) %>%
 licor_df %<>% dplyr::rename(label23C = genotype) %>% mutate(
   label23C = convert23CToChar(label23C),
   rep = case_when(
-    row_corrected=="R1" ~1,
-    row_corrected=="R2" ~2,
+    rep_corrected=="R1" ~1,
+    rep_corrected=="R2" ~2,
     T ~3
   )
   )
@@ -72,8 +72,8 @@ licor_df %<>% dplyr::rename(label23C = genotype) %>% mutate(
 # Make avg time by label23C, rep, location, and date column
 
 # Remove columns we don't want
-rm_cols <- c("row_corrected", "obs", "config_name", 
-                     "config_author", "remark", "na", "row")
+rm_cols <- c("rep_corrected", "obs", "config_name", 
+                     "config_author", "remark", "plant_number","na", "row")
 licor_df %<>% select(-all_of(rm_cols)) %>% select("label23C", "location","rep", everything())
 
 
@@ -270,22 +270,20 @@ grouping_cols <- c("rep", "label23C", "location")
 
 # 1. Check all df meet criteria for merge ######################################
 # licor_df
-# Currently the licor_df data for location == 'Fabian' is not broken up into replications
-# to do: work with ibrar on best way to handle this - currently looking at ONLY Leyendecker
-licor_df_ley <- licor_df_summary %>% filter(location == "Leyendecker")
+#licor_df_ley <- licor_df_summary %>% filter(location == "Leyendecker")
 
 # hplc_df
-hplc_df_summary_ley <- hplc_df_summary %>% filter(location == "Leyendecker")
+#hplc_df_summary_ley <- hplc_df_summary %>% filter(location == "Leyendecker")
 
 
 # harvest_summary
 # check
-harvest_summary_ley <- harvest_summary %>% filter(location == "Leyendecker")
+#harvest_summary_ley <- harvest_summary %>% filter(location == "Leyendecker")
 
 
 # 2. Merge all df ##############################################################
-df_summary <- hplc_df_summary_ley %>% merge(harvest_summary_ley, by = grouping_cols) %>% 
-  merge(licor_df_ley, by = grouping_cols) 
+df_summary <- hplc_df_summary %>% merge(harvest_summary, by = grouping_cols) %>% 
+  merge(licor_df_summary, by = grouping_cols) 
 
 
 

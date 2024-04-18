@@ -5,6 +5,7 @@ source("preprocess.R")
 #####################
 # 1. LICOR #####################################################################
 
+# Look at difference between leyendecker dates
 
 # 2. SHU #######################################################################
 genoList <- unique(hplcRaw$label23C)

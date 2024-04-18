@@ -61,7 +61,7 @@ licor_df <- bind_rows(fabian_raw, ley09_raw) %>%
 
 # Make cols consistent with other data sources
 licor_df %<>% dplyr::rename(label23C = genotype) %>% mutate(
-  label23C = convert23CToChar(label23C),
+  label23C = convertNumTo3DigitChar(label23C),
   rep = case_when(
     rep_corrected=="R1" ~1,
     rep_corrected=="R2" ~2,
@@ -116,7 +116,7 @@ hplc_df %<>% mutate(
     T ~"Superhot"
   ),
   shuLabel = factor(shuLabel, levels = c("Mild", "Hot", "Very Hot", "Extremely Hot", "Superhot")),
-  label23C = convert23CToChar(label23C),
+  label23C = convertNumTo3DigitChar(label23C),
   location = case_when(
     location == "Leyendecker" ~"Leyendecker",
     T ~"Fabian")
@@ -124,7 +124,7 @@ hplc_df %<>% mutate(
 
 # Make all columns uniform between data sources
 hplc_df %<>% dplyr::rename(rep = replication) %>% 
-  mutate(label23C = convert23CToChar(label23C))
+  mutate(label23C = convertNumTo3DigitChar(label23C))
 
 # Clean up cases where we have 2 samples for one group (rep, location, label23C)
 # note - each gbs and name are specific for label23C
@@ -175,6 +175,12 @@ rm_cols_univ <- c("no", "plot_score_july_5", "plot_score_june_9", "plot_score_ju
 harvest_raw_fg %<>% select(-any_of(rm_cols_univ)) 
 harvest_raw_ley %<>% select(-any_of(rm_cols_univ)) 
 
+# Correct GBS to be consistent labeling with other dataframes
+harvest_raw_fg$gbs <- gsub("\\D+", "", harvest_raw_fg$gbs)
+harvest_raw_fg$gbs[harvest_raw_fg$gbs == ""] <- harvest_raw_fg$name[harvest_raw_fg$gbs == ""]
+harvest_raw_ley$gbs <- gsub("\\D+", "", harvest_raw_ley$gbs)
+harvest_raw_ley$gbs[harvest_raw_ley$gbs == ""] <- harvest_raw_ley$name[harvest_raw_ley$gbs == ""]
+
 # Create cols to condense different ones in FG an Ley
 # FG has cols "transplants with flowers" and "transplants with fruit" this 
 #   represents # of transplanted plants with each
@@ -207,7 +213,7 @@ harvest_raw_ley %<>% rowwise() %>%
   mutate(transplanted_date = as.Date("04/26/2023", format = "%m/%d/%Y"),
          date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
          days_from_t_to_h = date_harvested - transplanted_date,
-         label23C = convert23CToChar(label23C),
+         label23C = convertNumTo3DigitChar(label23C),
          location = "Leyendecker"
   )
 
@@ -215,7 +221,7 @@ harvest_raw_fg %<>% rowwise() %>%
   mutate(transplanted_date = as.Date("04/27/2023", format = "%m/%d/%Y"),
          date_harvested = as.Date(date_harvested, format = "%m.%d.%Y"),
          days_from_t_to_h = date_harvested - transplanted_date,
-         label23C = convert23CToChar(label23C),
+         label23C = convertNumTo3DigitChar(label23C),
          location = "Fabian"
   )
 checkDates(harvest_raw_fg)
@@ -280,10 +286,15 @@ grouping_cols <- c("rep", "label23C", "location")
 # check
 #harvest_summary_ley <- harvest_summary %>% filter(location == "Leyendecker")
 
+hplc_df_summary %>% mutate(inHplc = 1) %>% 
+  merge(harvest_summary %>% mutate(inHarvest = 1) , by = grouping_cols) %>% 
+  merge(licor_df_summary %>% mutate(inLicor = 1) , by = grouping_cols, all = TRUE) %>% 
+  select(label23C, rep, location, inHplc, inHarvest, inLicor) %>% View()
+
 
 # 2. Merge all df ##############################################################
 df_summary <- hplc_df_summary %>% merge(harvest_summary, by = grouping_cols) %>% 
-  merge(licor_df_summary, by = grouping_cols) 
+  merge(licor_df_summary, by = grouping_cols, all = TRUE) 
 
 
 

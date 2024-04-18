@@ -5,7 +5,7 @@
 #          ###                                           ###                   #
 #          #################################################                   #
 #          #################################################                   #
-convert23CToChar <- function(label){
+convertNumTo3DigitChar <- function(label){
   'Function that converts a gbs to string (if originally numeric)
   NOTE - GBS convention states that all GBS numbers have 3 characters,
   if the number is less that 100, then the missing space will be filled in by 0.

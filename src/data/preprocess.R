@@ -1,7 +1,7 @@
 packages <- c("tidyr", "readxl", "dplyr", "magrittr", "purrr", "ggplot2", "Hmisc",
               "snakecase", "lubridate", "plyr") 
 invisible(lapply(packages, require, character.only = TRUE ))
-source('src/funcs.R')
+source('src/data/funcs.R')
 
 ###############################################################################
 ## NOTES:
@@ -263,10 +263,6 @@ harvest_summary <- plyr::rbind.fill(harvest_fg_summary, harvest_ley_summary)
 
 # 4. ENIRONMENTAL/WEATHER ######################################################
 
-
-
-
-
 #
 
 ################################################################################
@@ -289,12 +285,15 @@ grouping_cols <- c("rep", "label23C", "location")
 hplc_df_summary %>% mutate(inHplc = 1) %>% 
   merge(harvest_summary %>% mutate(inHarvest = 1) , by = grouping_cols) %>% 
   merge(licor_df_summary %>% mutate(inLicor = 1) , by = grouping_cols, all = TRUE) %>% 
-  select(label23C, rep, location, inHplc, inHarvest, inLicor) %>% View()
+  select(label23C, rep, location, inHplc, inHarvest, inLicor) #%>% View()
 
 
 # 2. Merge all df ##############################################################
 df_summary <- hplc_df_summary %>% merge(harvest_summary, by = grouping_cols) %>% 
   merge(licor_df_summary, by = grouping_cols, all = TRUE) 
+
+# 3. Write df to csv ###########################################################
+write.csv(df_summary, file = 'Data/processed/data.csv')
 
 
 

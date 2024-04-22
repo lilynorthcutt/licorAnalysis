@@ -46,7 +46,17 @@ df_filtered <- df %>% filter(!(date == "2023-06-20" ))
 ###                         .     Features.                                 ####
 ################################################################################
 
-## Add normalized column for 
+# Rename row as label23c
+df %<>% rowwise() %>% 
+  mutate(unique_id = paste0(label23C, "-",location, "-",rep, "-", date)) %>% 
+  select(-unique_id) %>% as.data.frame()
+rownames(df) <- df$unique_id
+
+
+# Remove if all values are the same
+same_val_col_list <- colnames(df[vapply(df, function(x) length(unique(x)) <= 1, logical(1L))])
+df <- df[vapply(df, function(x) length(unique(x)) > 1, logical(1L))]
+
 
 ################################################################################
 ###                         .     Exploration                               ####
@@ -102,14 +112,15 @@ heatmap(as.matrix(df_filtered_cor ), scale="column")
 # Compare differences in values by date
 exclude_columns <- c( "label23C", "name", "gbs", "rep", "shuLabel", "date")
 
-prep_scale <- df %>% filter(location == "Leyendecker") %>% 
+prep_diff <- df %>% filter(location == "Leyendecker") %>% 
   select(-location, -all_of(rm_for_cor)) %>% #remove columns we are not interested in looking at for now
   select(label23C, name, gbs, rep, shuLabel, date, shu, everything()) %>% #rearrange columns
   filter(!is.na(shu)) 
 
-scaled_df <- prep_scale %>%  
+scaled_df <- prep_diff %>%  
   mutate(across(-all_of(exclude_columns), scale)) %>% 
   dplyr::group_by(rep, label23C) %>% arrange(date) %>% 
+  summarize_at(vars(-any_of(exclude_columns)), ~last(.) - first(.))
   
   
   
@@ -124,11 +135,56 @@ df_diff <- scaled_df %>%
   group_by(species) %>%
   summarize_at(vars(starts_with("feature")), ~last(.) - first(.))
 
+################################################################################
+################################################################################
+################################################################################
+install.packages("corrr")
+library('corrr')
+install.packages("ggcorrplot")
+library(ggcorrplot)
+install.packages("FactoMineR")
+library("FactoMineR")
+install.packages("factoextra")
+library("factoextra")
+
+library(gridExtra) #Arranging multiple plot grids
+library(gt)
+
 
 # Look at PCA of features
+colSums(is.na(df_filtered_cor))
+
+scaled <- scale(df_filtered_cor)
+
+corr_matrix <- cor(scaled)
+ggcorrplot(corr_matrix)
+
+data.pca <- princomp(corr_matrix)
+summary(data.pca)
+
+data.pca$loadings[, 1:2]
+
+fviz_eig(data.pca, addlabels = TRUE)
+fviz_pca_var(data.pca, col.var = "black")
+fviz_cos2(data.pca, choice = "var", axes = 1:2)
+
+fviz_pca_var(data.pca, col.var = "cos2",
+             gradient.cols = c("black", "orange", "green"),
+             repel = TRUE)
+
+################################################################################
+
+
+results <- prcomp(df_filtered_cor, scale = TRUE)
+results$rotation <- -1*results$rotation
+results$rotation
+
+
+results$x <- -1*results$x
+head(results$x)
+
+results$sdev^2 / sum(results$sdev^2)*100 
 
 
 
-# Look at decision tree of features
-
-
+#

@@ -77,6 +77,22 @@ ggdensity(df_filtered$shu)
 
 # Look at scatterplot with gbs on lower, and each licor on top
 
+# Select scaled or unscaled - DONE
+# Select which features to display 
+# Select what to facet_wrap on - DONE
+# Select which Label to - DONE
+
+dont_pivot <- c("rep", "label23C", "location", "shu", "shuLabel", "date")
+data_scaled <- data %>% select(dont_pivot) %>% cbind(map(data %>% select(!any_of(dont_pivot)), scale, center = TRUE, scale = TRUE))
+
+data_w_features <- data_scaled %>% pivot_longer(cols = !any_of(dont_pivot), names_to = "features", values_to = "feature_val")
+
+ggplot(data_w_features)+
+  geom_point(aes(x = features, y = feature_val, color = shuLabel))+ 
+  facet_wrap(.~location)+
+  ggtitle("Stress Factors")+
+  xlab("Value")+
+  ylab("Factors")
 
 
 ################################################################################

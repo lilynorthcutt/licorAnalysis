@@ -11,7 +11,7 @@ source('src/data/funcs.R')
 # 2. SHU Data collected from HPLC. Contains scoville heat unit data
 # 3. Plant data collected from human entry. Contains data taken at harvest such 
 #.   as pepper weight, yield, number of mature/unripe fruit, etc.
-# 4. Environmental data
+# 4. Environmental data (TO BE ADDED LATER)
 
 # Questions for Ibrar: does FG not have rows?
 # we don't know which rows are for which shu?

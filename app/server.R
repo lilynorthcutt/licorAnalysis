@@ -44,7 +44,10 @@ shinyServer(function(input, output) {
 
   # PIVOT LONGER ON FEATURES FOR GRAPHING
   filtered_df_licor_features <- reactive(({
-    filtered_df_licor() %>% pivot_longer(cols = !any_of(dont_pivot), names_to = "features", values_to = "feature_val")
+    
+    
+    filtered_df_licor() %>% select(all_of(vars_to_keep), all_of(input$factors_to_plot)) %>% 
+      pivot_longer(cols = !any_of(dont_pivot), names_to = "features", values_to = "feature_val")
   }))
   
   
@@ -84,18 +87,17 @@ shinyServer(function(input, output) {
   # Create scatter plot based on selection
   output$plot_scatter_licor <- renderPlot({
     req(input$facet_column) # Wait until a column is selected
+    req(input$factors_to_plot) # Wait until a column is selected
     
     
     ggplot(filtered_df_licor_features()) +
       geom_point(aes(x = features, y = feature_val, color = shuLabel)) +
       facet_wrap(as.formula(paste(".~", input$facet_column))) +
       ggtitle("Stress Factors") +
-      xlab("Value") +
-      ylab("Factors") +
+      xlab("Stress Factor") +
+      ylab("Value") +
       scale_color_manual(values = c("deepskyblue", "darkorange", "brown1"))+
-      theme(axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank())
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
     
   })
   

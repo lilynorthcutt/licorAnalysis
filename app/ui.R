@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyWidgets)
 library(shinythemes)
+library(plotly)
 
 # Define UI for application
 shinyUI(fluidPage(
@@ -58,6 +59,13 @@ shinyUI(fluidPage(
                 h2("Graphing Options"),
                 selectInput("facet_column", "Select a feature to split graphs:", 
                             choices = c('rep', 'location', 'label23C', 'date')),
+                pickerInput(
+                  "factors_to_plot",
+                  "Select Factors to Plot",
+                  choices = unique(colnames(data)),
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE
+                ),
                 
 
                ),
